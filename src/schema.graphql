@@ -1,0 +1,53 @@
+const { ApolloServer} = require('apollo-server');
+
+const typeDefs = `
+  type Query {
+    info: String!
+    feed: [infoBdd!]!
+  }
+
+  type infoBdd{
+    id:ID!
+    description:String!
+    url:String!
+    nested:[nest!]!
+    arrayed:[String!]
+  }
+
+  type nest{
+    data1:String!
+    data2:String!
+  }
+
+  type Mutation {
+  post(url: String!, description: String!): infoBdd!
+  }
+
+`
+const resolvers = {
+  Query: {
+    info: () => `This is the API of a Hackernews Clone`,
+    feed: ()=>bdd,
+  },
+
+  infoBdd:{
+    id:(parent)=>parent.id,
+    description:(parent)=>parent.description,
+    url:(parent)=>parent.url,
+  },
+  nest:{
+    data1:(parent)=>parent.nested.data1,
+    data2:(parent)=>parent.nested.data2,
+  }
+}
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+})
+
+server
+  .listen()
+  .then(({ url }) =>
+    console.log(`Server is running on ${url}`)
+  );

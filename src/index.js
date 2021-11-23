@@ -1,32 +1,43 @@
-const { ApolloServer } = require('apollo-server');
+const { ApolloServer,gql} = require('apollo-server');
 
-// 1
-const typeDefs =gql `
+// Esquemas
+const typeDefs =gql`
   type Query {
     info: String!
-    feed: [Link!]!
+    feed: [infoBdd!]!
   }
-  type Link{
+  type infoBdd{
     id:ID!
     description:String!
     url:String!
+    nested:[nest!]!
+    arrayed:[String!]
+  }
+  type nest{
+    data1:String!
+    data2:String!
   }
 `
-
-// 2
+// Funcionalidad
 const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
-    feed: ()=>links, //apunta a la bdd
+    feed: ()=>bdd, //apunta a la bdd
   },
-  link:{
+  /*en este caso se define Link y no Query porque Query es palabra reservada, link es custom
+  entonces decir feed{[infoBdd]} es lo mismo que decir bdd.infoBdd.XYZ*/
+  infoBdd:{
     id:(parent)=>parent.id,
     description:(parent)=>parent.description,
     url:(parent)=>parent.url,
+  },
+  nest:{
+    data1:(parent)=>parent.nested.data1,
+    data2:(parent)=>parent.nested.data2,
   }
 }
 
-// 3
+// Servidor
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -39,9 +50,25 @@ server
   );
 
   //bdd
-var links=[{
-  id:"link-0",
-  url:"www.howtographql.com",
-  description:"Fullstack tutorial"
-}
+var bdd=[
+  {
+    id:"link-0",
+    url:"www.howtographql.com",
+    description:"Fullstack tutorial",
+    nested:{
+      data1:"nested1",
+      data2:"nested2",
+    },
+    arrayed:[("array1.1","array1.2"),("array2.1","array2.2")],
+  },
+  {
+    id:"link-1",
+    url:"www.howtomakeme.com",
+    description:"4ssh0le tutorial",
+    nested:{
+      data1:"nested1",
+      data2:"nested2",
+      arrayed:[("array1.1","array1.2"),("array2.1","array2.2")],
+    }
+  }
 ]
