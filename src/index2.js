@@ -51,6 +51,7 @@ const typeDefs=gql`
   type Query{
     personCount:Int!
     allPersons:[persons]!
+    findPerson(name:String!):persons
   }
 `
 //Funcionalidad
@@ -58,6 +59,10 @@ const resolvers={
   Query:{
     personCount:()=>persons.length,
     allPersons:()=>persons,
+    findPerson:(args)=>{
+      const{name}=args
+      return persons.find(person=>person.name===name)
+    }
   }
 }
 
